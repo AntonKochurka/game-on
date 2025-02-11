@@ -3,11 +3,21 @@ import react from '@vitejs/plugin-react-swc'
 import tailwindcss from '@tailwindcss/vite'
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
+import path from 'path'
+
 // https://vite.dev/config/
 export default defineConfig({
+  root: __dirname,
+  cacheDir: "./node_modules/.vite/.",
+  envDir: path.join(__dirname, "..", "..", ".."),
   plugins: [
     react(), 
     tailwindcss(),
     TanStackRouterVite({ autoCodeSplitting: true }),
   ],
+  resolve: {
+    alias: {
+        "@core": path.resolve(__dirname, "src", "core"),
+    },
+  },
 })
