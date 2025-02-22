@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     def FRONTEND_URL(self) -> str:
         return f"http://{self.VITE_HOST}:{self.VITE_PORT}/"
 
+
+    ACCESS_SECRET: str
+    REFRESH_SECRET: str
+
     class Config:
         env_file = str(Path(__file__).resolve().parent.parent.parent.parent / ".env")
         env_file_encoding = "utf-8"
