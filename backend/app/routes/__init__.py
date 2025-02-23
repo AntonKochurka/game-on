@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 
-from . import auth
+from . import auth, users
 
-def setup_router(app: FastAPI):
+def setup_router(app: FastAPI) -> None:
     for mod in [
-        auth
+        auth.router,
+        users.router,
     ]:
         app.include_router(mod.router)

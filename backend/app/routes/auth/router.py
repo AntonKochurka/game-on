@@ -1,12 +1,16 @@
 from fastapi import APIRouter, Depends
-from fastapi.responses import Response, JSONResponse
+from fastapi.responses import JSONResponse
 
 from app.services.jwt_token import TokenService, TokenPayload, TokenPair, get_current_user, get_token_service, validate_refresh_token
+from app.routes.auth.models import LoginRequest
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=TokenPair)
-async def login(token_service: TokenService = Depends(get_token_service)) -> JSONResponse:
+async def login(
+    login_request: LoginRequest,
+    token_service: TokenService = Depends(get_token_service)
+) -> JSONResponse:
     user_id = "id"
     tokens = token_service.generate_tokens(user_id)
     response = JSONResponse(tokens.model_dump())

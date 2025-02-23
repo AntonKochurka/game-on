@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     ACCESS_SECRET: str
     REFRESH_SECRET: str
 
+    PAGINATION_UNIT: int = 10
+
     class Config:
         env_file = str(Path(__file__).resolve().parent.parent.parent.parent / ".env")
         env_file_encoding = "utf-8"
