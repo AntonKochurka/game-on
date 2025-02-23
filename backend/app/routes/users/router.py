@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse
 
-from app.routes.users.models import UserCreateRequest
+from app.routes.users.models import UserCreateRequest, UserModel
 from app.db.session import AsyncSession, get_db
 from app.db.models.user import UserRepo, User
 
@@ -10,7 +10,8 @@ from app.services.paginator import PaginatorResult, PaginatorService
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-async def list_users(
+@router.get("/", response_model=PaginatorResult)
+async def users__get(
     page: int = Query(1, gt=0, description="Page number (1-based)"),
     per_page: int = Query(None, gt=0, description="Items per page"),
     sort_by: str = Query("id", description="Field to sort by"),
@@ -25,7 +26,8 @@ async def list_users(
                 .apply_sort(sort_by, order)
                 .get_page(
                     page=page,
-                    per_page=per_page
+                    per_page=per_page,
+                    item_model=UserModel
                 )
             ).model_dump(), status_code=200
         )

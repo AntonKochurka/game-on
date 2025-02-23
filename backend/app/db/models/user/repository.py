@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from app.db.models.user import User
+from app.db.models.user.model import User
 from typing import Optional
 
 class UserRepo:

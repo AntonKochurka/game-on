@@ -5,7 +5,7 @@ from sqlalchemy.orm import joinedload
 from pydantic import BaseModel
 from typing_extensions import Literal
 
-from core.settings import settings
+from app.core.settings import settings
 
 
 class PaginatorResult(BaseModel):
@@ -115,7 +115,7 @@ class PaginatorService:
         items = result.unique().scalars().all() 
 
         return PaginatorResult(
-            items=[item_model.model_validate(i).model_dump() for i in items],
+            items=[item_model.model_validate(i.get_look()).model_dump() for i in items],
             page=page,
             total_pages=total_pages,
             total_items=total_items
