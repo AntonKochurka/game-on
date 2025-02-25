@@ -1,7 +1,7 @@
-from app.db.base import Base, DateTime
+from app.db.base import Base, TimestampMixin
 from sqlalchemy import Column, String
 
-class User(Base, DateTime):
+class User(Base, TimestampMixin):
     __tablename__ = 'users'
 
     username = Column(String, unique=True, index=True, nullable=False)

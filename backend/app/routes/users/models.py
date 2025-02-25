@@ -13,3 +13,6 @@ class UserModel(BaseModel):
     email: str
 
     role: str
+
+    created_at: str
+    updated_at: str

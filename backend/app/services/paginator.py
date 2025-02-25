@@ -1,12 +1,18 @@
+from fastapi import Request
 from typing import Type, Any, List, Optional, Dict
 from sqlalchemy import select, func, asc, desc, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing_extensions import Literal
 
 from app.core.settings import settings
 
+class DefaultPaginatorQueries(BaseModel):
+    page: int = Field(1, gt=0, description="Page number (1-based)")
+    per_page: int | None = Field(None, gt=0, description="Items per page")
+    sort_by: str = Field("created_at", description="Field to sort by")
+    order: str = Field("asc", description="Sorting direction: asc|desc")
 
 class PaginatorResult(BaseModel):
     items: List[Dict[str, Any]]
@@ -28,16 +34,28 @@ class PaginatorService:
     - like: Like pattern
     """
 
-    def __init__(self, session: AsyncSession, model: Type[Any]) -> None:
+    def __init__(
+        self, session: AsyncSession, 
+        model: Type[Any], item_model: BaseModel
+    ) -> None:
         self.session = session
         self.model = model
+        self.item_model = item_model
         self._query = select(self.model)
 
-    def apply_filters(self, **filters: Any) -> "PaginatorService":
+    def apply_filters(self, request: Request | None = None, **filters: Any) -> "PaginatorService":
         """
         Apply filter conditions to the query.
         Use field__operator syntax: age__gt=25, name__like='John%'
         """
+        if request is not None:
+            filters.update({
+                key: value for key, value in request.query_params.items()
+                if key not in {"page", "per_page", "sort_by", "order"} 
+                and key in set(self.item_model.model_fields.keys()) 
+                # If bad boy wants to filter by not-in-model-field, he won't get result at all
+            })
+
         conditions = []
         for key, value in filters.items():
             if '__' in key:
@@ -90,15 +108,11 @@ class PaginatorService:
         self,
         page: int = 1,
         per_page: Optional[int] = None,
-        item_model: Type[BaseModel] = None,
         **filters: Any
     ) -> PaginatorResult:
         """
         Retrieve a paginated page of results.
         """
-        if item_model is None:
-            raise ValueError("item_model must be provided to serialize items.")
-
         per_page = per_page or settings.PAGINATION_UNIT
 
         self.apply_filters(**filters)
@@ -115,7 +129,7 @@ class PaginatorService:
         items = result.unique().scalars().all() 
 
         return PaginatorResult(
-            items=[item_model.model_validate(i.get_look()).model_dump() for i in items],
+            items=[self.item_model.model_validate(i.get_look()).model_dump() for i in items],
             page=page,
             total_pages=total_pages,
             total_items=total_items
