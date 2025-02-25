@@ -8,3 +8,5 @@ declare module '@tanstack/react-router' {
     router: typeof router
   }
 }
+
+export default router;
