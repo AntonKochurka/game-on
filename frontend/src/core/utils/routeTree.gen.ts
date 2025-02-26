@@ -11,9 +11,37 @@
 // Import Routes
 
 import { Route as rootRoute } from './../routes/__root'
+import { Route as AboutImport } from './../routes/about'
+import { Route as IndexImport } from './../routes/index'
+import { Route as TournamentsIndexImport } from './../routes/tournaments/index'
+import { Route as TeamsIndexImport } from './../routes/teams/index'
 import { Route as AuthSignupImport } from './../routes/auth/signup'
 
 // Create/Update Routes
+
+const AboutRoute = AboutImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const IndexRoute = IndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TournamentsIndexRoute = TournamentsIndexImport.update({
+  id: '/tournaments/',
+  path: '/tournaments/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const TeamsIndexRoute = TeamsIndexImport.update({
+  id: '/teams/',
+  path: '/teams/',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AuthSignupRoute = AuthSignupImport.update({
   id: '/auth/signup',
@@ -25,11 +53,39 @@ const AuthSignupRoute = AuthSignupImport.update({
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/signup': {
       id: '/auth/signup'
       path: '/auth/signup'
       fullPath: '/auth/signup'
       preLoaderRoute: typeof AuthSignupImport
+      parentRoute: typeof rootRoute
+    }
+    '/teams/': {
+      id: '/teams/'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof TeamsIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/tournaments/': {
+      id: '/tournaments/'
+      path: '/tournaments'
+      fullPath: '/tournaments'
+      preLoaderRoute: typeof TournamentsIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -38,33 +94,53 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/teams': typeof TeamsIndexRoute
+  '/tournaments': typeof TournamentsIndexRoute
 }
 
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/teams': typeof TeamsIndexRoute
+  '/tournaments': typeof TournamentsIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/auth/signup': typeof AuthSignupRoute
+  '/teams/': typeof TeamsIndexRoute
+  '/tournaments/': typeof TournamentsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/auth/signup'
+  fullPaths: '/' | '/about' | '/auth/signup' | '/teams' | '/tournaments'
   fileRoutesByTo: FileRoutesByTo
-  to: '/auth/signup'
-  id: '__root__' | '/auth/signup'
+  to: '/' | '/about' | '/auth/signup' | '/teams' | '/tournaments'
+  id: '__root__' | '/' | '/about' | '/auth/signup' | '/teams/' | '/tournaments/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  TeamsIndexRoute: typeof TeamsIndexRoute
+  TournamentsIndexRoute: typeof TournamentsIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AuthSignupRoute: AuthSignupRoute,
+  TeamsIndexRoute: TeamsIndexRoute,
+  TournamentsIndexRoute: TournamentsIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -77,11 +153,27 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/auth/signup"
+        "/",
+        "/about",
+        "/auth/signup",
+        "/teams/",
+        "/tournaments/"
       ]
+    },
+    "/": {
+      "filePath": "index.tsx"
+    },
+    "/about": {
+      "filePath": "about.tsx"
     },
     "/auth/signup": {
       "filePath": "auth/signup.tsx"
+    },
+    "/teams/": {
+      "filePath": "teams/index.tsx"
+    },
+    "/tournaments/": {
+      "filePath": "tournaments/index.tsx"
     }
   }
 }
